@@ -110,7 +110,7 @@ function woonumday_update_lineitem_subtotal( $cart_item, $cart_item_key, $subtot
     // option to allow prod price same as days fee
     $optqnty = 0;
     $found = false; // Default value
-
+    $wndttltext = get_option( 'woonumday_options' )['woonumday_cstitle_field'];
     foreach ( $woocommerce->cart->get_cart() as $cart_item_key => $cart_item) 
     {
     /* Check for the wnd_fee Line Item in Woocommerce Cart */
@@ -128,7 +128,7 @@ function woonumday_update_lineitem_subtotal( $cart_item, $cart_item_key, $subtot
             $subtotal  = esc_attr( $wnd_cost * $wnd_qnty );
             $subtotals = floatval( preg_replace( '#[^\d.]#', '', $subtotal ) );      
             } 
-    }   $woocommerce->cart->add_fee( __('Fees', 'woocommerce'), $subtotals, true, '' );
+    }   $woocommerce->cart->add_fee( __($wndttltext, 'woocommerce'), $subtotals, true, '' );
    endif;
   
 }
