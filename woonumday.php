@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       WooNumDay
  * Plugin URI:        http://themes.tradesouthwest.com/wordpress/plugins/
- * Description:       Using WooCommerce, adds number of days to checkout. Opens under Settings > WooNumDays.
+ * Description:       For WooCommerce, adds number of days to checkout. Opens under Settings > WooNumDays.
  * Version:           1.0.0
  * Author:            Larry Judd
  * Author URI:        http://tradesouthwest.com
@@ -36,6 +36,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+if (!defined('WOONUMDAY_VER')) { define('WOONUMDAY_VER', '1.0.1'); } 
 //activate/deactivate hooks
 function woonumday_plugin_activation() {
 
@@ -65,22 +66,30 @@ function woonumday_deregister_shortcode() {
 register_activation_hook( __FILE__, 'woonumday_plugin_activation');
 register_deactivation_hook( __FILE__, 'woonumday_plugin_deactivation');
 
+if( is_admin() ) : 
 //enqueue script
-function woonumday_addtosite_scripts() {
+function woonumday_addtoplugin_scripts() {
+    wp_enqueue_style( 'woonumday-admin',  plugin_dir_url(__FILE__) 
+                      . 'lib/woonumday-admin-style.css',
+                      array(), 
+                      WOONUMDAY_VER, 
+                      false );
     // Register Scripts
     wp_register_script( 'woonumday-plugin', 
        plugins_url( 'lib/woonumday-plugin.js', __FILE__ ), 
        array( 'jquery' ), true );
-    
-    wp_enqueue_script( 'woonumbday-plugin' );
+    wp_enqueue_style ( 'woonumday-admin' ); 
+    wp_enqueue_script( 'woonumday-plugin' );
    
 }
+endif;
 //add_action( 'wp_enqueue_scripts', 'woonumday_addtosite_scripts' );
 //load admin scripts as well
-//add_action( 'admin_init', 'woonumdays_addtosite_scripts' );
+add_action( 'admin_enqueue_scripts',  'woonumday_addtoplugin_scripts' );
 
 //include admin and public views
 require ( plugin_dir_path( __FILE__ ) . 'inc/woonumday-adminpage.php' ); 
-require ( plugin_dir_path( __FILE__ ) . 'inc/woonumday-addtocart.php' ); 
+require ( plugin_dir_path( __FILE__ ) . 'inc/woonumday-postmeta.php' ); 
+require ( plugin_dir_path( __FILE__ ) . 'inc/woonumday-quantity.php' ); 
 
 ?>
