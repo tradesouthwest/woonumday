@@ -1,0 +1,32 @@
+.accordion h2, .accordion-close {cursor: pointer; font-size:3em; background: #adb; padding: 10px;width: 60px; color: maroon;text-align: center;height:1em;line-height:.9}
+.accordion-content {background-color: #3ab;color: white;padding-bottom: 1em;}
+.accordian-content dl {margin-bottom: 2em;}
+.accordion-close {display: block;margin-top: 20px;text-decoration: none;cursor: pointer;}
+.accordion .accordion-content {max-height: 0;overflow: hidden;padding: 0 20px;transition: all 0.3s;	opacity: 0;}
+.accordion.open .accordion-content {max-height: 540px;padding: 10px 20px;opacity: 1;}
+.accordion-close{position:relative;bottom:0;}
+.wrap-woonumday-admin span.wndspan{font-size:small;color:#555;}
+
+.wntip {
+display: inline-block;
+vertical-align: middle;
+width: 1.1em;
+height: 1.1em;
+background: #adb;
+color:#f4ffff;
+padding: 0px 0px .33px 0px;
+cursor: help;
+border-radius: 50%;
+text-align: center;
+position:relative;
+left: .32em;
+top: -.24em;
+border: thin dashed #eee;
+line-height: 1.1;
+}
+.wntip[title]:focus {
+box-shadow: 0px 0px 4px #2bf;
+}
+.wntip:after {
+content: " ";
+}
