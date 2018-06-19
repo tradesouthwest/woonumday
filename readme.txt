@@ -1,19 +1,33 @@
-=== WooNumDays ===
+=== WooNumDay ===
 Contributors:  tradesouthwest
 Donate link: https://paypal.me/tradesouthwest
 Tags: woocommerce, woobookings
 Requires at least: 3.8
 Tested up to: 4.9
-Requies Woocommerce plugin
+Requies package Woocommerce 3.2
 Stable tag: trunk
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 Plugin URI: http://themes.tradesouthwest.com/plugins/
 
-Modify WooBookings to order product by number of days and not by dates.
-== Description ==
+Woocommerce add-to-cart addon adds duration or increments to products. Opens in Settings > WooNumDay
 
-Modify WooBookings to order product by number of days and not by dates. Adds Additional Fee price to the cart.
+== Description ==
+Woocommerce add-to-cart addon adds duration or increments to products.
+
+Adds duration fee by number of days and not by dates to cart and to order product. Adds Additional Fee price to the cart. 
+
+== Features ==
+
+* Adjust positions of text on cart and product page
+* Auto sense your currency symbol
+* Can be use for number of days, hours, any given duration
+* Option to turn off requirement of adding duration to cart
+* No strings attached simplicity setup and configure
+* Set admin order text
+* Set email invoice text
+* Allow for tax rate separate from the product tax rate
+* Help and Instructions built into admin page
 
 == Installation ==
 
@@ -29,27 +43,16 @@ A.: There is a chart in your admin page with the names of all the selectors. If 
 your background colors to.
 
 == Screenshots ==
- 
+
 == Upgrade Notice ==
-ou can create a product object using the following function:
 
-$product = wc_get_product( $post_id );
-
-And after that you will be able to access to all product's data. All available methods can be found here, but the ones you need are:
-
-$product->get_regular_price();
-$product->get_sale_price();
-$product->get_price();
-
-
-n/a
+MoJoMarketplace handles upgrades
 
 == Changelog ==
 
-= 1.0.0 =
+= 1.0.1 =
 * June 2018
+* initial release
 
 == Notes ==
-
-
 Have a wonderful time!
