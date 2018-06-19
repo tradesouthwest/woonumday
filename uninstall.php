@@ -9,12 +9,10 @@ global $wpdb;
 // Delete options.
 $wpdb->query( "DELETE FROM $wpdb->options WHERE option_name LIKE 'woonumday\_%';" );
 $options = array(
-	'woonumday_cstitle_field' /*
-	'wc_show_weight_dimensions',
-	'wc_show_weight_dimensions',
-	'woocommerce_show_attributes_span',
-	'woocommerce_show_attributes_hide_labels',
-	'woocommerce_show_attributes_on_shop' */
+	'woonumday_cstitle_field',
+	'woonumday_csdescription_field',
+	'woonumday_wndinwidth_field',
+	'woonumday_wndtaxbase_field'
 );
 foreach( $options as $option ) {
 	delete_option( $option );
