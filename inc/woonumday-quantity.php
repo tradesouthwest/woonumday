@@ -114,7 +114,7 @@ function woonumday_get_cart_item_from_session( $cart_item, $values ) {
  
         return $cart_item;
 }
-
+add_filter( 'woocommerce_get_cart_item_from_session', 'woonumday_get_cart_item_from_session', 20, 2 );
 
 /** 
  * calculate additional fees, add to item totals
@@ -139,18 +139,16 @@ function woonumday_update_lineitem_subtotal( $cart_item, $cart_item_key, $cart )
         // option to allow prod price same as days fee
         $optqnty = get_option( 'woonumday_options' )['woonumday_wndmatch_field'] 
                  ? get_option( 'woonumday_options' )['woonumday_wndmatch_field'] : 0;
+        $wndtaxx = get_option( 'woonumday_options' )['woonumday_wndtaxbase_field'] 
+                 ? get_option( 'woonumday_options' )['woonumday_wndtaxbase_field'] : 'zero';
+        
         //label in cart totals
         $wndttltext = get_option( 'woonumday_options' )['woonumday_cstitle_field'];
-        //initialize counters  
-        $tcount = absint($cart_size);
-        $wnd_fee = '';
-        $wnd_fee = array();
-        //$i = 0;
-             $found = false; 
+        $wnd_fee    = '';        // clean string
+        $wnd_fee    = array();  // init array
+        $found      = false;   // default
         foreach ( $woocommerce->cart->get_cart() as $cart_item_key => $cart_item ) 
         { 
-        //$i = $i + 1;
-    
         /* Check for the wnd_fee Line Item in Woocommerce Cart */
         $_wnd_qnty = $cart_item['woonumday_custom_option'];
             if( '' != $_wnd_qnty && $_wnd_qnty > $optqnty ) 
@@ -164,25 +162,24 @@ function woonumday_update_lineitem_subtotal( $cart_item, $cart_item_key, $cart )
                 $product_id = $cart_item['product_id'];
                 $wnd_qnty   = $cart_item['woonumday_custom_option'];            
                 $_fees      = $wnd_cost * $wnd_qnty;
-                
                 $wnd_fee[]  =  round($_fees, 2);             
                 }  
-                //if($tcount <= 1) break;
+                
         } //ends foreach loop
         
         $woocommerce->cart->add_fee( __($wndttltext, 'woonumday'), 
                                      array_sum($wnd_fee), 
-                                     'zero' 
+                                     $wndtaxx 
                                     );
     endif; 
 }
+
 /**
  * Get item data to display in cart
  * @param  array $other_data
  * @param  array $cart_item
  * @return array
  */
-
 function woonumday_get_item_data( $other_data, $cart_item ) {
 $label = get_option('woonumday_options')['woonumday_csdescription_field']; 
 
@@ -205,8 +202,6 @@ add_filter( 'woocommerce_get_item_data', 'woonumday_get_item_data', 10, 2 );
  * @param  array $values
  * @return void
  */
-add_filter( 'woocommerce_get_cart_item_from_session', 'woonumday_get_cart_item_from_session', 20, 2 );
-
 function woonumday_add_order_item_meta( $item_id, $values ) {
  
     if ( ! empty( $values['woonumday_custom_option'] ) ) {
