@@ -6,27 +6,52 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Display input on single product page
  * @return html
  */
-function woonumday_custom_option(){ 
+function woonumday_custom_option()
+{ 
+global $woocommerce, $post;
+    //$ppday = get_post_meta( $post->ID, 'woonumday_fee', true ); 
     $plchld = '';
     $wndtext = get_option('woonumday_options')['woonumday_wndproduct_field'];
     $wndwdth = get_option('woonumday_options')['woonumday_wndinwidth_field'];
     $value = isset( $_POST['_woonumday_custom_option'] ) 
     ? sanitize_text_field( $_POST['_woonumday_custom_option'] ) : '';
-    printf( '<div class="quanity wnd"> 
-            <label>%s</label> 
+    
+    printf( '<div class="aligncenter wnd"> 
+            <label>%s </label>
             <input id="wnd_quantity"
-                   class="input-text"
+                   class="input-text wndqty"
                    style="%s" 
                    type="number" 
                    name="_woonumday_custom_option" 
                    value="%s"
-                   placeholder="%s" /></div>', 
+                   placeholder="" /> </div>', 
                    esc_html( $wndtext ), 
                    esc_attr( $wndwdth ), 
-                   esc_attr( $value ),
-                   esc_attr($plchld) );
+                   esc_attr( $value )
+                   );
+   
+      
 }
-add_action( 'woocommerce_before_add_to_cart_button', 'woonumday_custom_option', 9 );
+add_action( 'woocommerce_before_add_to_cart_button', 'woonumday_custom_option', 11 );
+
+/**
+ * Display price on single product page
+ * @return html
+ */
+function woonumday_custom_option_label($product)
+{ 
+global $woocommerce, $product;
+    $label = get_option('woonumday_options')['woonumday_cstitle_field']; 
+    $ppday = get_post_meta( $product->get_id(), '_woonumday_fee', true ); 
+    
+    printf( '<div class="input-text wndfee">
+            <label>%s </label>
+            <span>%s</span></div>',
+            esc_html( $label ), 
+            esc_html( $ppday ) 
+            ); 
+} 
+add_action( 'woocommerce_single_product_summary', 'woonumday_custom_option_label', 9 );
 
 /**
  * Validate when adding to cart
@@ -93,46 +118,64 @@ function woonumday_get_cart_item_from_session( $cart_item, $values ) {
 
 /** 
  * calculate additional fees, add to item totals
- * set tax rate (universal)
- * TODO wc_numeric_decimals,  'woocommerce_cart_product_subtotal'
+ * set tax rate (universal between all wndfees)
+ * TODO wc_numeric_decimals
  * @param array $cart_item_key
  * @param array $cart_item
  * @param string $subtotal
  
  */ 
-add_action( 'woocommerce_before_calculate_totals', 'woonumday_update_lineitem_subtotal', 12, 3 );
+add_action( 'woocommerce_before_calculate_totals', 'woonumday_update_lineitem_subtotal', 10, 3 );
  
-function woonumday_update_lineitem_subtotal( $cart_item, $cart_item_key, $subtotal ) 
+function woonumday_update_lineitem_subtotal( $cart_item, $cart_item_key, $cart ) 
 {
-    //$ttl = $woocommerce->cart->get_cart_content_total();
     global $woocommerce;
-    if ( sizeof( WC()->cart->get_cart() ) > 0 ) :  
-    // option to allow prod price same as days fee
-    $optqnty = 0;
-    $found = false; // Default value
-    $wndttltext = get_option( 'woonumday_options' )['woonumday_cstitle_field'];
-    foreach ( $woocommerce->cart->get_cart() as $cart_item_key => $cart_item) 
-    {
-    /* Check for the wnd_fee Line Item in Woocommerce Cart */
-        $_wnd_qnty = $cart_item['woonumday_custom_option'];
-        if( '' != $_wnd_qnty && $_wnd_qnty > $optqnty ) { 
-            $found = true;
-            }
-            if( $found == true) 
-            {
-            $wnd_cost  = get_post_meta( $cart_item['product_id'], '_woonumday_fee', true ); 
+    if ( is_admin() && ! defined( 'DOING_AJAX' ) )
+        return;
         
-            $product   = $cart_item['product_id'];
-            $wnd_qnty  = $cart_item['woonumday_custom_option'];
-            
-            $subtotal  = esc_attr( $wnd_cost * $wnd_qnty );
-            $subtotals = floatval( preg_replace( '#[^\d.]#', '', $subtotal ) );      
-            } 
-    }   $woocommerce->cart->add_fee( __($wndttltext, 'woocommerce'), $subtotals, true, '' );
-   endif;
-  
-}
 
+    $cart_size = sizeof( WC()->cart->get_cart() );
+    if ( $cart_size > 0 ) :  
+        // option to allow prod price same as days fee
+        $optqnty = get_option( 'woonumday_options' )['woonumday_wndmatch_field'] 
+                 ? get_option( 'woonumday_options' )['woonumday_wndmatch_field'] : 0;
+        //label in cart totals
+        $wndttltext = get_option( 'woonumday_options' )['woonumday_cstitle_field'];
+        //initialize counters  
+        $tcount = absint($cart_size);
+        $wnd_fee = '';
+        $wnd_fee = array();
+        //$i = 0;
+             $found = false; 
+        foreach ( $woocommerce->cart->get_cart() as $cart_item_key => $cart_item ) 
+        { 
+        //$i = $i + 1;
+    
+        /* Check for the wnd_fee Line Item in Woocommerce Cart */
+        $_wnd_qnty = $cart_item['woonumday_custom_option'];
+            if( '' != $_wnd_qnty && $_wnd_qnty > $optqnty ) 
+            { $found = true; }
+
+                if( $found == true)  
+                { 
+
+                $wnd_cost   = get_post_meta( $cart_item['product_id'], 
+                                            '_woonumday_fee', true );
+                $product_id = $cart_item['product_id'];
+                $wnd_qnty   = $cart_item['woonumday_custom_option'];            
+                $_fees      = $wnd_cost * $wnd_qnty;
+                
+                $wnd_fee[]  =  round($_fees, 2);             
+                }  
+                //if($tcount <= 1) break;
+        } //ends foreach loop
+        
+        $woocommerce->cart->add_fee( __($wndttltext, 'woonumday'), 
+                                     array_sum($wnd_fee), 
+                                     'zero' 
+                                    );
+    endif; 
+}
 /**
  * Get item data to display in cart
  * @param  array $other_data
